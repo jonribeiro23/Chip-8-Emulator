@@ -1,9 +1,8 @@
-import { keyMap, NUMBER_OF_KEYS } from "./src/constants/keyboardConstants"
+import { keyMap, NUMBER_OF_KEYS } from "./constants/keyboardConstants"
 
 export class Keyboard{
     constructor(){
         this.keys = new Array(NUMBER_OF_KEYS).fill(false)
-        console.log('c ', this.keys)
         document.addEventListener('keydown', (event) => this.keydown(event.key))
         document.addEventListener('keyup', (event) => this.keyup(event.key))
     }
@@ -12,17 +11,14 @@ export class Keyboard{
         const keyIndex = keyMap.findIndex((mapKey) => mapKey === key.toLowerCase())
 
         if(keyIndex > -1){
-            console.log('Find key', key, ' map to ', keyIndex)
             this.keys[keyIndex] = true
         }
-        console.log('f', this.keys)
     }
 
     keyup(key){
         const keyIndex = keyMap.findIndex((mapKey) => mapKey === key.toLowerCase())
 
         if(keyIndex > -1){
-            console.log('Find key', key, ' map to ', keyIndex)
             this.keys[keyIndex] = false
         }
     }
