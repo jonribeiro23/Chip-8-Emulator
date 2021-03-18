@@ -7,6 +7,7 @@ async function runChip8(){
 
         if(chip8.register.DT > 0){
             await chip8.sleep()
+            chip8.register.DT--
         }
     }
     
