@@ -8,11 +8,12 @@ import { Registers } from './Registers';
 export class Chip8{
 	constructor(){
         console.log('Creating a new chip8')
-        this.display = new Display()
         this.memory = new Memory()
+        this.loadCharSet()
         this.register = new Registers()
         this.keyboard = new Keyboard()
-        this.loadCharSet()
+        
+        this.display = new Display(this.memory)
     }
 
     sleep(ms = 500){

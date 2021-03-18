@@ -25,11 +25,12 @@ __webpack_require__.r(__webpack_exports__);
 class Chip8{
 	constructor(){
         console.log('Creating a new chip8')
-        this.display = new _Display__WEBPACK_IMPORTED_MODULE_3__.Display()
         this.memory = new _Memory__WEBPACK_IMPORTED_MODULE_4__.Memory()
+        this.loadCharSet()
         this.register = new _Registers__WEBPACK_IMPORTED_MODULE_5__.Registers()
         this.keyboard = new _Keyboard__WEBPACK_IMPORTED_MODULE_0__.Keyboard()
-        this.loadCharSet()
+        
+        this.display = new _Display__WEBPACK_IMPORTED_MODULE_3__.Display(this.memory)
     }
 
     sleep(ms = 500){
@@ -218,18 +219,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Display": () => (/* binding */ Display)
 /* harmony export */ });
-/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7);
+/* harmony import */ var _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7);
+
 
 
 class Display{
-    constructor(){
+    constructor(memory){
         console.log('Creating a new display')
+        this.memory = memory
+
         this.screen = document.querySelector('canvas')
-        this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY
-        this.screen.heigth = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY
+        this.screen.width = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY
+        this.screen.heigth = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT * _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY
         
         this.context = this.screen.getContext('2d')
-        this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR
+        this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.BG_COLOR
         this.context.fillRect(0, 0, this.screen.heigth, this.screen.width)
         
         this.frameBuffer = []
@@ -238,10 +243,10 @@ class Display{
     }
 
     reset(){
-        for (let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; i++) {
+        for (let i = 0; i < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT; i++) {
             this.frameBuffer.push([])
-            for (let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; j++) {
-                this.frameBuffer[i].push(1)
+            for (let j = 0; j < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH; j++) {
+                this.frameBuffer[i].push(0)
             }
         }
         this.context.fillRect(0, 0, this.screen.heigth, this.screen.width)
@@ -249,9 +254,9 @@ class Display{
     }
 
     drawBuffer(){
-        for (let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_HEIGHT; h++) {
+        for (let h = 0; h < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_HEIGHT; h++) {
             this.frameBuffer.push([])
-            for (let w = 0; w < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_WIDTH; w++) {
+            for (let w = 0; w < _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_WIDTH; w++) {
                 this.drawPixel(h, w, this.frameBuffer[h][w])
             }
         }
@@ -259,15 +264,26 @@ class Display{
 
     drawPixel(h, w, value){
         if(value){
-            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.COLOR
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.COLOR
         }else{
-            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.BG_COLOR
+            this.context.fillStyle = _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.BG_COLOR
         }
         this.context.fillRect(
-            h*_constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
-            w*_constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
-            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY,
-            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_0__.DISPLAY_MULTIPLY);
+            h*_constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY,
+            w*_constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY,
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY,
+            _constants_displayConstants__WEBPACK_IMPORTED_MODULE_1__.DISPLAY_MULTIPLY);
+    }
+
+    drawSprite(h, w, spriteAddress, num){
+        for (let lh = 0; lh < num; lh++) {
+            const line = this.memory.memory[spriteAddress+lh]
+            for (let lw = 0; lw < _constants_charSetConstants__WEBPACK_IMPORTED_MODULE_0__.CHAR_SET_WITH; lw++) {
+                const bitToCheck = (0b10000000 >> lw)
+                const value = line & bitToCheck
+                this.drawPixel(w+lw, h+lh, value)
+            }
+        }
     }
 }
 
@@ -467,11 +483,10 @@ __webpack_require__.r(__webpack_exports__);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8()
 
 async function runChip8(){
-    console.log(chip8.memory.getMemory(0).toString(16))
-    console.log(chip8.memory.getMemory(1).toString(16))
-    console.log(chip8.memory.getMemory(2).toString(16))
-    console.log(chip8.memory.getMemory(3).toString(16))
-    console.log(chip8.memory.getMemory(4).toString(16))
+    chip8.display.drawSprite(10, 1, 15, 5)
+    chip8.display.drawSprite(10, 6, 5, 5)
+    chip8.display.drawSprite(10, 11, 25, 5)
+    chip8.display.drawSprite(10, 16, 20, 5)
 }
 
 runChip8()
