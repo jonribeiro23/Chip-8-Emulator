@@ -15,6 +15,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Display__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6);
 /* harmony import */ var _Memory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(8);
 /* harmony import */ var _Registers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(9);
+/* harmony import */ var _constants_registersConstants__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(10);
+
 
 
 
@@ -33,7 +35,7 @@ class Chip8{
         this.display = new _Display__WEBPACK_IMPORTED_MODULE_3__.Display(this.memory)
     }
 
-    sleep(ms = 500){
+    sleep(ms = _constants_registersConstants__WEBPACK_IMPORTED_MODULE_6__.TIMER_60_HZ){
         return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
@@ -300,7 +302,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "COLOR": () => (/* binding */ COLOR)
 /* harmony export */ });
 const DISPLAY_WIDTH = 64
-const DISPLAY_HEIGHT = 32
+const DISPLAY_HEIGHT = 320
 const DISPLAY_MULTIPLY = 10
 const BG_COLOR = '#000'
 const COLOR = '#3f6'
@@ -358,8 +360,8 @@ class Registers{
     constructor(){
         this.V = new Uint8Array(_constants_registersConstants__WEBPACK_IMPORTED_MODULE_0__.NUMBER_OF_REGISTERS)
         this.I = 0
-        this.delayTimer = 0
-        this.soundTimer = 0
+        this.DT = 0
+        this.ST = 0
         
         //Program counter
         this.PC = _constants_memoryConstants__WEBPACK_IMPORTED_MODULE_1__.LOAD_PROGRAM_ADRESS
@@ -412,10 +414,12 @@ class Registers{
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "NUMBER_OF_REGISTERS": () => (/* binding */ NUMBER_OF_REGISTERS),
-/* harmony export */   "STACK_DEEP": () => (/* binding */ STACK_DEEP)
+/* harmony export */   "STACK_DEEP": () => (/* binding */ STACK_DEEP),
+/* harmony export */   "TIMER_60_HZ": () => (/* binding */ TIMER_60_HZ)
 /* harmony export */ });
 const NUMBER_OF_REGISTERS = 16
 const STACK_DEEP = 16
+const TIMER_60_HZ = 1000/60
 
 /***/ })
 /******/ 	]);
@@ -483,10 +487,14 @@ __webpack_require__.r(__webpack_exports__);
 const chip8 = new _Chip8__WEBPACK_IMPORTED_MODULE_0__.Chip8()
 
 async function runChip8(){
-    chip8.display.drawSprite(10, 1, 15, 5)
-    chip8.display.drawSprite(10, 6, 5, 5)
-    chip8.display.drawSprite(10, 11, 25, 5)
-    chip8.display.drawSprite(10, 16, 20, 5)
+    while (1) {
+        await chip8.sleep(1000)
+
+        if(chip8.register.DT > 0){
+            await chip8.sleep()
+        }
+    }
+    
 }
 
 runChip8()

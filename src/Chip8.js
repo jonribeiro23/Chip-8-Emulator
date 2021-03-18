@@ -4,6 +4,7 @@ import { CHAR_SET_ADDRESS } from './constants/memoryConstants';
 import { Display } from './Display'
 import { Memory } from "./Memory";
 import { Registers } from './Registers';
+import { TIMER_60_HZ } from './constants/registersConstants';
 
 export class Chip8{
 	constructor(){
@@ -16,7 +17,7 @@ export class Chip8{
         this.display = new Display(this.memory)
     }
 
-    sleep(ms = 500){
+    sleep(ms = TIMER_60_HZ){
         return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
